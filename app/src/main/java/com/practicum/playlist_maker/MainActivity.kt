@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.practicum.playlist_maker.ui.theme.BlackPrimary
 import com.practicum.playlist_maker.ui.theme.BluePrimary
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
+import com.practicum.playlist_maker.ui.theme.PlaylistmakerTheme
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 
 private data class MenuItemData(
@@ -52,7 +53,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen()
+            PlaylistmakerTheme {
+                MainScreen()
+            }
         }
     }
 }
