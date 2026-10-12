@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.practicum.playlist_maker.ui.theme.BlackPrimary
 import com.practicum.playlist_maker.ui.theme.GreyLight
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
@@ -46,20 +48,10 @@ import com.practicum.playlist_maker.ui.theme.PlaylistmakerTheme
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 
 
-class SearchActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            PlaylistmakerTheme {
-                SearchScreen()
-            }
-        }
-    }
-}
-
 @Composable
-private fun SearchScreen(){
+fun SearchScreen(
+    onNavigateBack: () -> Unit
+){
 
     var searchQuery by remember { mutableStateOf("") }
 
@@ -69,7 +61,7 @@ private fun SearchScreen(){
             .background(color = WhitePrimary)
             .padding(WindowInsets.statusBars.asPaddingValues())
     ){
-        PanelHeader()
+        PanelHeader(onNavigateBack)
         SearchBar(
             query = searchQuery,
             onQueryChange = { searchQuery = it }
@@ -80,29 +72,29 @@ private fun SearchScreen(){
 }
 
 @Composable
-@Preview(showSystemUi = true)
-private fun SearchScreenPreview(){
-    SearchScreen()
-}
-
-@Composable
-private fun PanelHeader(){
+private fun PanelHeader(
+    onNavigateBack: () -> Unit
+){
     Row(
         modifier = Modifier
             .height(56.dp)
             .fillMaxWidth()
             .padding(start = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+
     ){
         Icon(
             painter = painterResource(R.drawable.arrow_back),
             contentDescription = "arrow back",
             tint = BlackPrimary,
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier
+                .size(16.dp)
+                .clickable{ onNavigateBack() }
         )
         Text(
             stringResource(R.string.search),
+            modifier = Modifier.padding(4.dp),
             style = MaterialTheme.typography.titleLarge,
             color = BlackPrimary
         )

@@ -52,21 +52,11 @@ private val menuItems = listOf(
     SettingsItemData(R.drawable.arrow_icon, R.string.user_agreement, ::readAgreement)
 )
 
-class SettingsActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            PlaylistmakerTheme {
-                SettingsScreen()
-            }
-        }
-    }
-}
-
 
 @Composable
-private fun SettingsScreen(){
+fun SettingsScreen(
+    onNavigateBack: () -> Unit
+){
 
     Column(
         modifier = Modifier
@@ -74,14 +64,16 @@ private fun SettingsScreen(){
             .background(color = WhitePrimary)
             .padding(WindowInsets.statusBars.asPaddingValues())
     ) {
-                PanelHeader()
+                PanelHeader(onNavigateBack)
                 SettingsList()
         }
 
 }
 
 @Composable
-private fun PanelHeader(){
+private fun PanelHeader(
+    onNavigateBack: () -> Unit
+){
     Box(
         modifier = Modifier
             .height(56.dp)
@@ -89,6 +81,14 @@ private fun PanelHeader(){
             .padding(horizontal = 12.dp, vertical = 10.dp),
         contentAlignment = Alignment.CenterStart
     ){
+        Icon(
+            painter = painterResource(R.drawable.arrow_back),
+            contentDescription = "arrow back",
+            tint = BlackPrimary,
+            modifier = Modifier
+                .size(16.dp)
+                .clickable{ onNavigateBack() }
+        )
         Text(
             text = stringResource(R.string.settings),
             modifier = Modifier.padding(4.dp),
@@ -171,10 +171,4 @@ private fun readAgreement(context: Context){
         data = context.getString(R.string.agreement_link).toUri()
     }
     context.startActivity(Intent.createChooser(intent, "Открыть пользовательское соглашение"))
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun SettingsScreenPreview(){
-    SettingsScreen()
 }

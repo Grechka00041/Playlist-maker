@@ -1,6 +1,5 @@
 package com.practicum.playlist_maker
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,23 +28,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.practicum.playlist_maker.ui.theme.BlackPrimary
 import com.practicum.playlist_maker.ui.theme.BluePrimary
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
 import com.practicum.playlist_maker.ui.theme.PlaylistmakerTheme
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 
-
-private val menuItems = listOf(
-    MenuItemData(R.drawable.search_icon, R.string.search, SearchActivity::class.java),
-    MenuItemData(R.drawable.library_icon, R.string.playlists, SearchActivity::class.java),
-    MenuItemData(R.drawable.favourite_icon, R.string.favourite, SearchActivity::class.java),
-    MenuItemData(R.drawable.settings_icon, R.string.settings, SettingsActivity::class.java)
+private data class MenuItemData(
+    val iconResId: Int,
+    val textResId: Int,
+    val onClick: () -> Unit
 )
 
 class MainActivity : ComponentActivity() {
@@ -54,14 +50,18 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PlaylistmakerTheme {
-                MainScreen()
+                val navController = rememberNavController()
+                PlaylistHost(navController)
             }
         }
     }
 }
 
 @Composable
-private fun MainScreen(){
+fun MainScreen(
+    onNavigateToSearch: () -> Unit,
+    onNavigateToSettings: () -> Unit
+){
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -69,14 +69,11 @@ private fun MainScreen(){
             .padding(WindowInsets.statusBars.asPaddingValues())
     ) {
         Header()
-        Menu()
+        Menu(
+            onNavigateToSearch = onNavigateToSearch,
+            onNavigateToSettings = onNavigateToSettings
+        )
     }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun MainScreenPreview(){
-    MainScreen()
 }
 
 @Composable
@@ -99,9 +96,11 @@ private fun Header(){
     }
 }
 
-
 @Composable
-private fun Menu(){
+private fun Menu(
+    onNavigateToSearch: () -> Unit,
+    onNavigateToSettings: () -> Unit
+){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -113,19 +112,25 @@ private fun Menu(){
             .padding(top = 8.dp, start = 16.dp, end = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ){
-        MenuList()
+        MenuList(onNavigateToSearch, onNavigateToSettings)
     }
 }
 
-private data class MenuItemData(
-    val iconResId: Int,
-    val textResId: Int,
-    val activityClass: Class<*>
-)
+
 
 
 @Composable
-private fun MenuList(){
+private fun MenuList(
+    onNavigateToSearch: () -> Unit,
+    onNavigateToSettings: () -> Unit
+){
+    val menuItems = listOf(
+        MenuItemData(R.drawable.search_icon, R.string.search) { onNavigateToSearch() },
+        MenuItemData(R.drawable.library_icon, R.string.playlists) { /* Пока заглушка */ },
+        MenuItemData(R.drawable.favourite_icon, R.string.favourite) { /* Пока заглушка */ },
+        MenuItemData(R.drawable.settings_icon, R.string.settings) { onNavigateToSettings() }
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -135,24 +140,19 @@ private fun MenuList(){
             MainMenuItem(
                 icon = painterResource(menuItem.iconResId),
                 text = stringResource(menuItem.textResId),
-                targetClass = menuItem.activityClass
+                onClick = menuItem.onClick
             )
         }
     }
 }
 
 @Composable
-private fun MainMenuItem(icon: Painter, text: String, targetClass: Class<*>){
-    val context = LocalContext.current
+private fun MainMenuItem(icon: Painter, text: String, onClick: () -> Unit){
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(66.dp)
             .padding(horizontal = 12.dp, vertical = 18.dp)
-            .clickable{
-                val intent = Intent(context, targetClass)
-                context.startActivity(intent)
-            }
         ,
         horizontalArrangement = Arrangement.SpaceBetween
     ){
@@ -177,7 +177,9 @@ private fun MainMenuItem(icon: Painter, text: String, targetClass: Class<*>){
             painter = painterResource(R.drawable.arrow_icon),
             contentDescription = "arrow_icon",
             tint = GreyPrimary,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier
+                .size(24.dp)
+                .clickable{ onClick() }
         )
     }
 }
