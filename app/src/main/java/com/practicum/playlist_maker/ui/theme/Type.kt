@@ -37,8 +37,8 @@ val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = YsTextMedium,
         fontWeight = FontWeight.W500,
-        fontSize = 22.sp,
-        lineHeight = 24.sp,
+        fontSize = 16.sp,
+        lineHeight = 18.sp,
         letterSpacing = 0.5.sp
     ),
     titleLarge = TextStyle(

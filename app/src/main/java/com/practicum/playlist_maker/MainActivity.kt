@@ -4,17 +4,21 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -36,11 +40,6 @@ import com.practicum.playlist_maker.ui.theme.GreyPrimary
 import com.practicum.playlist_maker.ui.theme.PlaylistmakerTheme
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 
-private data class MenuItemData(
-    val iconResId: Int,
-    val textResId: Int,
-    val activityClass: Class<*>
-)
 
 private val menuItems = listOf(
     MenuItemData(R.drawable.search_icon, R.string.search, SearchActivity::class.java),
@@ -52,6 +51,7 @@ private val menuItems = listOf(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             PlaylistmakerTheme {
                 MainScreen()
@@ -63,7 +63,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MainScreen(){
     Box(
-        modifier = Modifier.fillMaxSize().background(BluePrimary)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BluePrimary)
+            .padding(WindowInsets.statusBars.asPaddingValues())
     ) {
         Header()
         Menu()
@@ -114,6 +117,13 @@ private fun Menu(){
     }
 }
 
+private data class MenuItemData(
+    val iconResId: Int,
+    val textResId: Int,
+    val activityClass: Class<*>
+)
+
+
 @Composable
 private fun MenuList(){
     Column(
@@ -122,7 +132,7 @@ private fun MenuList(){
             .padding(horizontal = 16.dp)
     ) {
         menuItems.forEach { menuItem ->
-            MenuItem(
+            MainMenuItem(
                 icon = painterResource(menuItem.iconResId),
                 text = stringResource(menuItem.textResId),
                 targetClass = menuItem.activityClass
@@ -132,7 +142,7 @@ private fun MenuList(){
 }
 
 @Composable
-private fun MenuItem(icon: Painter, text: String, targetClass: Class<*>){
+private fun MainMenuItem(icon: Painter, text: String, targetClass: Class<*>){
     val context = LocalContext.current
     Row(
         modifier = Modifier
@@ -171,4 +181,5 @@ private fun MenuItem(icon: Painter, text: String, targetClass: Class<*>){
         )
     }
 }
+
 

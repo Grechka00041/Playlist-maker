@@ -3,18 +3,19 @@ package com.practicum.playlist_maker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -48,11 +49,11 @@ import com.practicum.playlist_maker.ui.theme.WhitePrimary
 class SearchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             PlaylistmakerTheme {
                 SearchScreen()
             }
-
         }
     }
 }
@@ -62,20 +63,20 @@ private fun SearchScreen(){
 
     var searchQuery by remember { mutableStateOf("") }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = WhitePrimary)
+            .padding(WindowInsets.statusBars.asPaddingValues())
     ){
-        Column() {
-            PanelHeader()
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = { searchQuery = it }
-            )
+        PanelHeader()
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = { searchQuery = it }
+        )
         }
 
-    }
+
 }
 
 @Composable
@@ -120,7 +121,7 @@ private fun SearchBar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .height(46.dp)
+            .height(56.dp)
         ,
         placeholder = {
             Text(
