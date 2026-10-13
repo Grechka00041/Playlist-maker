@@ -3,14 +3,9 @@ package com.practicum.playlist_maker
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -23,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.practicum.playlist_maker.ui.theme.BlackPrimary
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
-import com.practicum.playlist_maker.ui.theme.PlaylistmakerTheme
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 import androidx.core.net.toUri
 
@@ -63,32 +58,38 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(color = WhitePrimary)
             .padding(WindowInsets.statusBars.asPaddingValues())
-    ) {
+    ){
                 PanelHeader(onNavigateBack)
                 SettingsList()
-        }
+    }
 
 }
 
 @Composable
+@Preview(showSystemUi = true)
+fun SettingsScreenPreview(){
+    SettingsScreen({})
+}
+@Composable
 private fun PanelHeader(
     onNavigateBack: () -> Unit
 ){
-    Box(
+    Row(
         modifier = Modifier
             .height(56.dp)
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 10.dp),
-        contentAlignment = Alignment.CenterStart
+        verticalAlignment = Alignment.CenterVertically
     ){
-        Icon(
-            painter = painterResource(R.drawable.arrow_back),
-            contentDescription = "arrow back",
-            tint = BlackPrimary,
-            modifier = Modifier
-                .size(16.dp)
-                .clickable{ onNavigateBack() }
-        )
+
+        IconButton(onNavigateBack) {
+            Icon(
+                painter = painterResource(R.drawable.arrow_back),
+                contentDescription = "arrow back",
+                tint = BlackPrimary,
+                modifier = Modifier.size(16.dp)
+            )
+        }
         Text(
             text = stringResource(R.string.settings),
             modifier = Modifier.padding(4.dp),

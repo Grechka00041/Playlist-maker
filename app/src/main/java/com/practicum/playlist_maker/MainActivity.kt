@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +20,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -117,8 +117,6 @@ private fun Menu(
 }
 
 
-
-
 @Composable
 private fun MenuList(
     onNavigateToSearch: () -> Unit,
@@ -173,14 +171,14 @@ private fun MainMenuItem(icon: Painter, text: String, onClick: () -> Unit){
             )
         }
 
-        Icon(
-            painter = painterResource(R.drawable.arrow_icon),
-            contentDescription = "arrow_icon",
-            tint = GreyPrimary,
-            modifier = Modifier
-                .size(24.dp)
-                .clickable{ onClick() }
-        )
+        IconButton(onClick) {
+            Icon(
+                painter = painterResource(R.drawable.arrow_icon),
+                contentDescription = "arrow_icon",
+                tint = GreyPrimary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }
 

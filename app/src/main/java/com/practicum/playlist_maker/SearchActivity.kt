@@ -1,12 +1,6 @@
 package com.practicum.playlist_maker
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -37,14 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.practicum.playlist_maker.ui.theme.BlackPrimary
 import com.practicum.playlist_maker.ui.theme.GreyLight
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
-import com.practicum.playlist_maker.ui.theme.PlaylistmakerTheme
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 
 
@@ -66,7 +57,7 @@ fun SearchScreen(
             query = searchQuery,
             onQueryChange = { searchQuery = it }
         )
-        }
+    }
 
 
 }
@@ -80,18 +71,16 @@ private fun PanelHeader(
             .height(56.dp)
             .fillMaxWidth()
             .padding(start = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-
+        verticalAlignment = Alignment.CenterVertically
     ){
-        Icon(
-            painter = painterResource(R.drawable.arrow_back),
-            contentDescription = "arrow back",
-            tint = BlackPrimary,
-            modifier = Modifier
-                .size(16.dp)
-                .clickable{ onNavigateBack() }
-        )
+        IconButton(onNavigateBack) {
+            Icon(
+                painter = painterResource(R.drawable.arrow_back),
+                contentDescription = "arrow back",
+                tint = BlackPrimary,
+                modifier = Modifier.size(16.dp)
+            )
+        }
         Text(
             stringResource(R.string.search),
             modifier = Modifier.padding(4.dp),

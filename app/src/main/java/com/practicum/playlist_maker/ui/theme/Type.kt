@@ -31,8 +31,6 @@ val YsTextRegular = FontFamily(
     Font(R.font.ys_text_regular_italic, FontWeight.W400, FontStyle.Italic)
 )
 
-
-
 val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = YsTextMedium,
