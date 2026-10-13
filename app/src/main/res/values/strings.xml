@@ -5,4 +5,13 @@
     <string name="playlists" translatable="false">Плейлисты</string>
     <string name="favourite" translatable="false">Избранное</string>
     <string name="settings" translatable="false">Настройки</string>
+    <string name="share" translatable="false">Поделиться приложением</string>
+    <string name="support" translatable="false">Написать в поддержку</string>
+    <string name="user_agreement" translatable="false">Пользовательское соглашение</string>
+    <string name="share_message" translatable="false">Посмотри какое крутое приложение Playlist Maker! </string>
+    <string name="share_email" translatable="false">23052006z@gmail.com</string>
+    <string name="share_theme" translatable="false">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="share_text" translatable="false">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="agreement_link" translatable="false">https://yandex.ru/legal/practicum_offer/ru/?from=main_basement-legal-praktikum-offer_button</string>
+
 </resources>
