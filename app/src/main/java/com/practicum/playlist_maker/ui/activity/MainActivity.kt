@@ -1,9 +1,10 @@
-package com.practicum.playlist_maker
+package com.practicum.playlist_maker.ui.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,8 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -32,11 +35,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
+import com.practicum.playlist_maker.ui.navigation.PlaylistHost
+import com.practicum.playlist_maker.R
+import com.practicum.playlist_maker.ui.navigation.Screen
 import com.practicum.playlist_maker.ui.theme.BlackPrimary
 import com.practicum.playlist_maker.ui.theme.BluePrimary
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
 import com.practicum.playlist_maker.ui.theme.PlaylistmakerTheme
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
+import com.practicum.playlist_maker.ui.view_model.SearchViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private data class MenuItemData(
     val iconResId: Int,
@@ -45,13 +55,21 @@ private data class MenuItemData(
 )
 
 class MainActivity : ComponentActivity() {
+    private val searchViewModel: SearchViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             PlaylistmakerTheme {
-                val navController = rememberNavController()
-                PlaylistHost(navController)
+                Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
+                    PlaylistHost(
+                        modifier = Modifier.Companion.padding(innerPadding),
+                        navController = rememberNavController(),
+                        gson = remember { Gson() },
+                        startDestination = "main",
+                        searchViewModel = searchViewModel
+                    )
+                }
             }
         }
     }

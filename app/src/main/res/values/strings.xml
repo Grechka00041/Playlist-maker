@@ -13,5 +13,7 @@
     <string name="share_theme" translatable="false">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
     <string name="share_text" translatable="false">Спасибо разработчикам и разработчицам за крутое приложение!</string>
     <string name="agreement_link" translatable="false">https://yandex.ru/legal/practicum_offer/ru/?from=main_basement-legal-praktikum-offer_button</string>
+    <string name="no_tracks_found">нет найденных треков</string>
+    <string name="check_connection">проверьте соединение</string>
 
 </resources>

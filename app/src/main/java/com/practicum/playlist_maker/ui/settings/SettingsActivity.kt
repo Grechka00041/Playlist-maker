@@ -1,4 +1,4 @@
-package com.practicum.playlist_maker
+package com.practicum.playlist_maker.ui.settings
 
 import android.content.Context
 import android.content.Intent
@@ -34,6 +34,7 @@ import com.practicum.playlist_maker.ui.theme.BlackPrimary
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 import androidx.core.net.toUri
+import com.practicum.playlist_maker.R
 
 
 private data class SettingsItemData(
