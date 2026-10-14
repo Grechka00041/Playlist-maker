@@ -7,6 +7,7 @@ import com.practicum.playlist_maker.domain.api.TracksRepository
 import org.koin.dsl.module
 
 val repositoryModule = module {
+
     factory<NetworkClient> {
         RetrofitNetworkClient()
     }

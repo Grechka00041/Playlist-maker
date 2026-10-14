@@ -7,21 +7,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,9 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -63,14 +57,11 @@ fun SearchScreen(
 ){
     val screenState by searchViewModel.searchScreenState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = WhitePrimary)
-            .padding(WindowInsets.statusBars.asPaddingValues())
     ){
         PanelHeader(onNavigateBack)
         SearchBar(
@@ -101,7 +92,7 @@ private fun PanelHeader(
         IconButton(onNavigateBack) {
             Icon(
                 painter = painterResource(R.drawable.arrow_back),
-                contentDescription = "arrow back",
+                contentDescription = stringResource(R.string.arrow_back),
                 tint = BlackPrimary,
                 modifier = Modifier.size(16.dp)
             )
@@ -142,7 +133,7 @@ private fun SearchBar(
         },
         leadingIcon = {
             Icon(
-                Icons.Default.Search,
+                painterResource(R.drawable.search_icon),
                 contentDescription = "search icon",
                 tint = GreyPrimary,
                 modifier = Modifier.size(16.dp)
@@ -178,7 +169,7 @@ private fun SearchBar(
 private fun SearchResults(
     screenState: SearchViewModel.SearchState,
     modifier: Modifier,
-    onTrackClick: (Track) -> Unit // Используем новое имя параметра
+    onTrackClick: (Track) -> Unit
 ) {
     when (screenState) {
         is SearchViewModel.SearchState.Initial -> {
@@ -197,13 +188,13 @@ private fun SearchResults(
         is SearchViewModel.SearchState.Success -> {
             val tracks = screenState.foundList
             if (tracks.isEmpty()) {
-                InformerState(stringResource(R.string.no_tracks_found))
+                InformerState(titleText = stringResource(R.string.no_tracks_found))
             } else {
                 LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(tracks.size) { index ->
                         TrackListItem(
                             track = tracks[index],
-                            onClick = { onTrackClick(tracks[index]) } // Вызываем навигацию по клику
+                            onClick = { onTrackClick(tracks[index]) }
                         )
                     }
                 }
@@ -212,8 +203,8 @@ private fun SearchResults(
 
         is SearchViewModel.SearchState.Fail -> {
             InformerState(
-                titleText = screenState.error, // Берём сообщение прямо из состояния
-                subtitleText = stringResource(R.string.check_connection) // Дополнительный текст из ресурсов
+                titleText = screenState.error,
+                subtitleText = stringResource(R.string.check_connection)
             )
         }
     }
@@ -221,9 +212,10 @@ private fun SearchResults(
 
 @Composable
 private fun InformerState(
+    modifier: Modifier = Modifier,
     titleText: String,
     subtitleText: String? = null,
-    modifier: Modifier = Modifier
+
 ) {
     Column(
         modifier = modifier
@@ -254,7 +246,7 @@ private fun InformerState(
 @Composable
 private fun TrackListItem(
     track: Track,
-    onClick: () -> Unit // Оставляем только обработчик одиночного клика
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
