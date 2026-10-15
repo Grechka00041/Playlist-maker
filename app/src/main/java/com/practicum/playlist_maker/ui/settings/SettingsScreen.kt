@@ -1,4 +1,4 @@
-package com.practicum.playlist_maker
+package com.practicum.playlist_maker.ui.settings
 
 import android.content.Context
 import android.content.Intent
@@ -8,14 +8,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +31,7 @@ import com.practicum.playlist_maker.ui.theme.BlackPrimary
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 import androidx.core.net.toUri
+import com.practicum.playlist_maker.R
 
 
 private data class SettingsItemData(
@@ -57,7 +55,6 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(color = WhitePrimary)
-            .padding(WindowInsets.statusBars.asPaddingValues())
     ){
                 PanelHeader(onNavigateBack)
                 SettingsList()
@@ -68,7 +65,7 @@ fun SettingsScreen(
 @Composable
 @Preview(showSystemUi = true)
 fun SettingsScreenPreview(){
-    SettingsScreen({})
+    SettingsScreen {}
 }
 @Composable
 private fun PanelHeader(
@@ -85,7 +82,7 @@ private fun PanelHeader(
         IconButton(onNavigateBack) {
             Icon(
                 painter = painterResource(R.drawable.arrow_back),
-                contentDescription = "arrow back",
+                contentDescription = stringResource(R.string.arrow_back),
                 tint = BlackPrimary,
                 modifier = Modifier.size(16.dp)
             )

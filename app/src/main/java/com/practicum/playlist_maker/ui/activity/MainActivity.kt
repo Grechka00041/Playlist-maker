@@ -1,4 +1,4 @@
-package com.practicum.playlist_maker
+package com.practicum.playlist_maker.ui.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,34 +9,39 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
+import com.practicum.playlist_maker.ui.navigation.PlaylistHost
+import com.practicum.playlist_maker.R
 import com.practicum.playlist_maker.ui.theme.BlackPrimary
 import com.practicum.playlist_maker.ui.theme.BluePrimary
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
 import com.practicum.playlist_maker.ui.theme.PlaylistmakerTheme
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
+import com.practicum.playlist_maker.ui.view_model.SearchViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private data class MenuItemData(
     val iconResId: Int,
@@ -45,16 +50,30 @@ private data class MenuItemData(
 )
 
 class MainActivity : ComponentActivity() {
+    private val searchViewModel: SearchViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             PlaylistmakerTheme {
-                val navController = rememberNavController()
-                PlaylistHost(navController)
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    PlaylistHost(
+                        modifier = Modifier.padding(innerPadding),
+                        navController = rememberNavController(),
+                        gson = remember { Gson() },
+                        startDestination = "main",
+                        searchViewModel = searchViewModel
+                    )
+                }
             }
         }
     }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun MainScreenPreview(){
+    MainScreen({}, {})
 }
 
 @Composable
@@ -62,11 +81,10 @@ fun MainScreen(
     onNavigateToSearch: () -> Unit,
     onNavigateToSettings: () -> Unit
 ){
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(BluePrimary)
-            .padding(WindowInsets.statusBars.asPaddingValues())
     ) {
         Header()
         Menu(
@@ -104,7 +122,7 @@ private fun Menu(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 70.dp)
+            .padding(top = 16.dp)
             .shadow(elevation = 4.dp, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .background(
                 color = WhitePrimary
