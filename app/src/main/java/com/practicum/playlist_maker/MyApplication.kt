@@ -10,7 +10,7 @@ import org.koin.dsl.module
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        //TODO: change to koin-android-start
+        //TODO: maybe change to koin-android-start
         startKoin {
             val viewModelModule = module {
                 viewModel {

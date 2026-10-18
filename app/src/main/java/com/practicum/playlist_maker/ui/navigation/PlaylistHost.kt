@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.gson.Gson
 import com.practicum.playlist_maker.domain.model.Track
-import com.practicum.playlist_maker.ui.activity.MainScreen
+import com.practicum.playlist_maker.ui.main.MainScreen
 import com.practicum.playlist_maker.ui.search.DetailsScreen
 import com.practicum.playlist_maker.ui.search.SearchScreen
 import com.practicum.playlist_maker.ui.settings.SettingsScreen
