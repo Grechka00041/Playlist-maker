@@ -4,12 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlist_maker.domain.api.TracksRepository
 import com.practicum.playlist_maker.domain.model.Track
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+
 class SearchViewModel(
-    private val trackRepository: TracksRepository
+    private val tracksRepository: TracksRepository
 ) : ViewModel() {
     sealed class SearchState {
         object Initial: SearchState()
@@ -20,18 +23,15 @@ class SearchViewModel(
     private val _searchScreenState = MutableStateFlow<SearchState>(SearchState.Initial)
     val searchScreenState = _searchScreenState.asStateFlow()
 
-    fun searchTracks(query: String) {
-        viewModelScope.launch {
-            _searchScreenState.value = SearchState.Searching
+    fun search(whatSearch: String){
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = trackRepository.searchTracksContains(query)
-                if (result.isNotEmpty()) {
-                    _searchScreenState.value = SearchState.Success(result)
-                } else {
-                    _searchScreenState.value = SearchState.Fail("Ничего не найдено")
-                }
+                _searchScreenState.update { SearchState.Searching }
+                val list = tracksRepository.searchTracks(expression = whatSearch)
+                _searchScreenState.update { SearchState.Success(foundList = list) }
             } catch (e: Exception) {
-                _searchScreenState.value = SearchState.Fail("Ошибка при поиске: ${e.message}")
+                val errorMsg = e.localizedMessage ?: "Неизвестная ошибка"
+                _searchScreenState.update { SearchState.Fail(errorMsg) }
             }
         }
     }
@@ -39,4 +39,5 @@ class SearchViewModel(
     fun clearSearch() {
         _searchScreenState.value = SearchState.Initial
     }
+
 }

@@ -66,7 +66,13 @@ fun SearchScreen(
         PanelHeader(onNavigateBack)
         SearchBar(
             query = searchQuery,
-            onQueryChange = { searchQuery = it }
+            onQueryChange = { searchQuery = it },
+            onClearClick = { searchViewModel.clearSearch() },
+            onSearchClick = {
+                if (searchQuery.isNotBlank()) {
+                    searchViewModel.search(searchQuery)
+                }
+            }
         )
         SearchResults(
             screenState = screenState,
@@ -110,7 +116,9 @@ private fun PanelHeader(
 @Composable
 private fun SearchBar(
     query: String,
-    onQueryChange: (String) -> Unit
+    onQueryChange: (String) -> Unit,
+    onClearClick: () -> Unit,
+    onSearchClick: () -> Unit
 ){
     OutlinedTextField(
         value = query,
@@ -132,19 +140,26 @@ private fun SearchBar(
             )
         },
         leadingIcon = {
-            Icon(
-                painterResource(R.drawable.search_icon),
-                contentDescription = "search icon",
-                tint = GreyPrimary,
-                modifier = Modifier.size(16.dp)
-            )
+            IconButton(onClick = {
+                if (query.isNotBlank()) onSearchClick()
+            }) {
+                Icon(
+                    painterResource(R.drawable.search_icon),
+                    contentDescription = stringResource(R.string.search),
+                    tint = GreyPrimary,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         },
         trailingIcon = {
             if(query.isNotEmpty()){
-                IconButton(onClick = { onQueryChange("")}) {
+                IconButton(onClick = {
+                    onQueryChange("")
+                    onClearClick()
+                }) {
                     Icon(
                         Icons.Default.Clear,
-                        contentDescription = "clear",
+                        contentDescription = stringResource(R.string.clear),
                         tint = GreyPrimary ,
                         modifier = Modifier.size(14.dp)
                     )
@@ -173,7 +188,7 @@ private fun SearchResults(
 ) {
     when (screenState) {
         is SearchViewModel.SearchState.Initial -> {
-            // Ничего не показываем в начальном состоянии
+            // Nothing to show in an initial state
         }
 
         is SearchViewModel.SearchState.Searching -> {
