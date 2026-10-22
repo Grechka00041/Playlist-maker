@@ -1,10 +1,10 @@
 package com.practicum.playlist_maker.ui.activity
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.practicum.playlist_maker.ui.navigation.PlaylistHost
 import com.practicum.playlist_maker.ui.navigation.Screen
+import com.practicum.playlist_maker.ui.search.SearchScreen
 import com.practicum.playlist_maker.ui.theme.PlaylistmakerTheme
 import com.practicum.playlist_maker.ui.view_model.SearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -39,6 +40,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
 
 
 

@@ -5,4 +5,6 @@ data class TrackDto(
     val trackName: String,
     val artistName: String,
     val trackTimeMillis: Long,
+    val image: String,
+    val favourite: Boolean
 )

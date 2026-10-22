@@ -2,17 +2,73 @@ package com.practicum.playlist_maker.data.storage
 
 import com.practicum.playlist_maker.data.dto.TrackDto
 
-class MockStorage: Storage {
+class MockStorage : Storage {
     override suspend fun getTracks(): List<TrackDto> {
         return listOf(
-            TrackDto(1, "Yesterday (Remastered 2009)", "The Beatles", 125000L),
-            TrackDto(2, "Here Comes The Sun (Remastered...)", "The Beatles", 187000L),
-            TrackDto(3, "No Reply", "The Beatles", 152000L),
-            TrackDto(4, "Let It Be", "The Beatles", 243000L),
-            TrackDto(5, "Girl", "The Beatles", 138000L),
-            TrackDto(6, "Michelle", "The Beatles", 167000L),
-            TrackDto(7, "Eleanor Rigby", "The Beatles", 198000L),
-            TrackDto(8, "Come Together", "The Beatles", 259000L)
+            TrackDto(
+                id = 1,
+                trackName = "Yesterday (Remastered 2009)",
+                artistName = "The Beatles",
+                trackTimeMillis = 175000L, // 2:55
+                image = "",
+                favourite = false,
+            ),
+            TrackDto(
+                id = 2,
+                trackName = "Here Comes The Sun (Remastered 2009)",
+                artistName = "The Beatles",
+                trackTimeMillis = 241000L, // 4:01
+                image = "",
+                favourite = false
+            ),
+            TrackDto(
+                id = 3,
+                trackName = "No Reply",
+                artistName = "The Beatles",
+                trackTimeMillis = 312000L, // 5:12
+                image = "",
+                favourite = false
+            ),
+            TrackDto(
+                id = 4,
+                trackName = "Let It Be",
+                artistName = "The Beatles",
+                trackTimeMillis = 361000L, // 6:01
+                image = "",
+                favourite = false
+            ),
+            TrackDto(
+                id = 5,
+                trackName = "Girl",
+                artistName = "The Beatles",
+                trackTimeMillis = 251000L, // 4:11
+                image = "",
+                favourite = false
+            ),
+            TrackDto(
+                id = 6,
+                trackName = "Michelle",
+                artistName = "The Beatles",
+                trackTimeMillis = 181000L, // 3:01
+                image = "",
+                favourite = false
+            ),
+            TrackDto(
+                id = 7,
+                trackName = "Eleanor Rigby",
+                artistName = "The Beatles",
+                trackTimeMillis = 372000L, // 6:12
+                image = "",
+                favourite = false
+            ),
+            TrackDto(
+                id = 8,
+                trackName = "Come Together",
+                artistName = "The Beatles",
+                trackTimeMillis = 249000L, // 4:09
+                image = "",
+                favourite = false
+            )
         )
     }
 }

@@ -43,7 +43,8 @@ fun PlaylistHost(
                     val trackJson = gson.toJson(track)
                     navController.navigate("details/$trackJson")
                 },
-                onNavigateBack = { navController.navigateBack() }
+                onNavigateBack = { navController.navigateBack() },
+                modifier = Modifier
             )
         }
 
