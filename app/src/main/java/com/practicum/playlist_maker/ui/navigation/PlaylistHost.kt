@@ -7,13 +7,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.gson.Gson
-import com.practicum.playlist_maker.domain.model.Track
+import com.practicum.playlist_maker.ui.favorite.FavoriteScreen
 import com.practicum.playlist_maker.ui.main.MainScreen
-import com.practicum.playlist_maker.ui.search.DetailsScreen
+import com.practicum.playlist_maker.ui.playlist.AddPlaylistScreen
+import com.practicum.playlist_maker.ui.playlist.PlaylistsScreen
 import com.practicum.playlist_maker.ui.search.SearchScreen
 import com.practicum.playlist_maker.ui.settings.SettingsScreen
+import com.practicum.playlist_maker.ui.track.TrackDetailsScreen
+import com.practicum.playlist_maker.ui.view_model.PlaylistsViewModel
 import com.practicum.playlist_maker.ui.view_model.SearchViewModel
-import kotlin.jvm.java
+import com.practicum.playlist_maker.ui.view_model.TrackDetailsViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun PlaylistHost(
@@ -21,7 +26,8 @@ fun PlaylistHost(
     startDestination: String = "main",
     navController: NavHostController,
     gson: Gson,
-    searchViewModel: SearchViewModel
+    searchViewModel: SearchViewModel,
+    playlistsViewModel: PlaylistsViewModel,
 ) {
     NavHost(
         navController = navController,
@@ -32,7 +38,9 @@ fun PlaylistHost(
         composable(Screen.MAIN.name) {
             MainScreen(
                 onNavigateToSearch = { navController.navigateToSearch() },
-                onNavigateToSettings = { navController.navigateToSettings() }
+                onNavigateToSettings = { navController.navigateToSettings() },
+                onNavigateToPlaylsists = { navController.navigate(Screen.PLAYLISTS.name) },
+                onNavigateToFavorite = { navController.navigate(Screen.FAVORITE.name) }
             )
         }
 
@@ -40,8 +48,7 @@ fun PlaylistHost(
             SearchScreen(
                 searchViewModel = searchViewModel,
                 onNavigateToDetailScreen = { track ->
-                    val trackJson = gson.toJson(track)
-                    navController.navigate("details/$trackJson")
+                    navController.navigate("${Screen.TRACK_DETAILS.name}/${track.id}")
                 },
                 onNavigateBack = { navController.navigateBack() },
                 modifier = Modifier
@@ -54,13 +61,44 @@ fun PlaylistHost(
             )
         }
 
-        composable(
-            route = "details/{trackJson}"
-        ) { backStackEntry ->
-            val trackJson = backStackEntry.arguments?.getString("trackJson")
-            if (trackJson != null) {
-                val track = gson.fromJson(trackJson, Track::class.java)
-                DetailsScreen(track = track)
+
+        composable(Screen.FAVORITE.name) {
+            FavoriteScreen(
+                onNavigateBack = { navController.navigateBack() }
+            )
+        }
+
+        composable(Screen.PLAYLISTS.name) {
+            PlaylistsScreen(
+                modifier = Modifier,
+                playlistsViewModel = playlistsViewModel,
+                addNewPlaylist = { navController.navigate(Screen.ADD_PLAYLIST.name) },
+                navigateToPlaylist = { },
+                navigateBack = { navController.navigateBack()}
+            )
+        }
+
+        composable(Screen.ADD_PLAYLIST.name) {
+            AddPlaylistScreen(
+                onNavigateBack = { navController.navigateBack() },
+                playlistsViewModel = playlistsViewModel
+            )
+        }
+
+        composable("${Screen.TRACK_DETAILS.name}/{trackId}") { backStackEntry ->
+            val trackIdString = backStackEntry.arguments?.getString("trackId")
+            val trackId = trackIdString?.toLongOrNull()
+
+            if (trackId != null) {
+                val viewModel: TrackDetailsViewModel = koinViewModel(
+                    parameters = { parametersOf(trackId) }
+                )
+
+                TrackDetailsScreen(
+                    onNavigateBack = { navController.navigateBack() },
+                    modifier = Modifier,
+                    trackDetailsViewModel = viewModel
+                )
             }
         }
 
@@ -75,6 +113,7 @@ fun NavController.navigateToSearch() {
 fun NavController.navigateToSettings() {
     navigate(Screen.SETTINGS.name)
 }
+
 
 fun NavController.navigateBack() {
     popBackStack()

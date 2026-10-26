@@ -41,7 +41,10 @@ private data class MenuItemData(
 @Composable
 fun MainScreen(
     onNavigateToSearch: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToPlaylsists: () -> Unit,
+    onNavigateToFavorite: () -> Unit
+
 ){
     Column(
         modifier = Modifier
@@ -51,7 +54,9 @@ fun MainScreen(
         Header()
         Menu(
             onNavigateToSearch = onNavigateToSearch,
-            onNavigateToSettings = onNavigateToSettings
+            onNavigateToSettings = onNavigateToSettings,
+            onNavigateToPlaylsists = onNavigateToPlaylsists,
+            onNavigateToFavorite = onNavigateToFavorite
         )
     }
 }
@@ -79,7 +84,9 @@ private fun Header(){
 @Composable
 private fun Menu(
     onNavigateToSearch: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToPlaylsists: () -> Unit,
+    onNavigateToFavorite: () -> Unit
 ){
     Column(
         modifier = Modifier
@@ -92,7 +99,7 @@ private fun Menu(
             .padding(top = 8.dp, start = 16.dp, end = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ){
-        MenuList(onNavigateToSearch, onNavigateToSettings)
+        MenuList(onNavigateToSearch, onNavigateToSettings, onNavigateToPlaylsists, onNavigateToFavorite)
     }
 }
 
@@ -100,12 +107,14 @@ private fun Menu(
 @Composable
 private fun MenuList(
     onNavigateToSearch: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToPlaylsists: () -> Unit,
+    onNavigateToFavorite: () -> Unit
 ){
     val menuItems = listOf(
         MenuItemData(R.drawable.search_icon, R.string.search) { onNavigateToSearch() },
-        MenuItemData(R.drawable.library_icon, R.string.playlists) { /* Пока заглушка */ },
-        MenuItemData(R.drawable.favourite_icon, R.string.favourite) { /* Пока заглушка */ },
+        MenuItemData(R.drawable.library_icon, R.string.playlists) { onNavigateToPlaylsists() },
+        MenuItemData(R.drawable.favourite_icon, R.string.favourite) { onNavigateToFavorite() },
         MenuItemData(R.drawable.settings_icon, R.string.settings) { onNavigateToSettings() }
     )
 
@@ -165,5 +174,5 @@ private fun MainMenuItem(icon: Painter, text: String, onClick: () -> Unit){
 @Preview(showSystemUi = true)
 @Composable
 fun MainScreenPreview(){
-    MainScreen({}, {})
+    MainScreen({}, {}, {}, {})
 }

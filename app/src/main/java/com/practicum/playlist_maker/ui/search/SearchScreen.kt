@@ -88,8 +88,6 @@ fun SearchScreen(
         }
     }
 
-
-
     Column(
         modifier = modifier
             .fillMaxSize()
