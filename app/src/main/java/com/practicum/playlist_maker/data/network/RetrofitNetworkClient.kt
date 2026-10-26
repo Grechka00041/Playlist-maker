@@ -3,18 +3,37 @@ package com.practicum.playlist_maker.data.network
 import com.practicum.playlist_maker.data.NetworkClient
 import com.practicum.playlist_maker.data.dto.BaseResponse
 import com.practicum.playlist_maker.data.dto.TracksSearchRequest
-import com.practicum.playlist_maker.data.dto.TracksSearchResponse
-import com.practicum.playlist_maker.data.storage.Storage
+import java.io.IOException
 
-class RetrofitNetworkClient(private val storage: Storage) : NetworkClient {
+class RetrofitNetworkClient(private val api: ITunesApiService) : NetworkClient {
+
     override suspend fun doRequest(dto: Any): BaseResponse {
-        return if (dto is TracksSearchRequest) {
-            TracksSearchResponse(results = storage.getTracks()).apply {
-                resultCode = 200
+        return try {
+            when (dto) {
+                is TracksSearchRequest -> {
+                    val response = api.searchTracks(
+                        query = dto.expression,
+                        media = "music",
+                        entity = "song",
+                        limit = 10
+                    )
+                    response.apply { resultCode = 200 }
+                }
+
+                else -> BaseResponse().apply {
+                    resultCode = 400
+                    errorMessage = "Invalid request type: expected TracksSearchRequest or String"
+                }
             }
-        } else {
-            TracksSearchResponse(results = emptyList()).apply {
-                resultCode = 400
+        } catch (e: IOException) {
+            BaseResponse().apply {
+                resultCode = -1
+                errorMessage = "Network error: ${e.message ?: "Unknown IO error"}"
+            }
+        } catch (e: Exception) {
+            BaseResponse().apply {
+                resultCode = -2
+                errorMessage = "Unexpected error: ${e.message ?: "Unknown error"}"
             }
         }
     }

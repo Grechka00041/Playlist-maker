@@ -38,10 +38,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,6 +61,7 @@ import com.practicum.playlist_maker.ui.theme.GreyPrimary
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 import com.practicum.playlist_maker.ui.view_model.SearchViewModel
 import androidx.lifecycle.compose.currentStateAsState
+import coil.compose.AsyncImage
 
 
 @Composable
@@ -87,8 +90,6 @@ fun SearchScreen(
             focusManager.clearFocus()
         }
     }
-
-
 
     Column(
         modifier = modifier
@@ -322,12 +323,13 @@ private fun TrackListItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        // Иконка трека (заглушка)
-        Icon(
-            painter = painterResource(id = android.R.drawable.ic_menu_gallery),
+        AsyncImage(
+            model = track.image,
             contentDescription = "Track ${track.trackName}",
-            modifier = Modifier.size(100.dp),
-            tint = Color.LightGray
+            modifier = Modifier.size(100.dp).clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
+            error = painterResource(id = android.R.drawable.ic_menu_gallery)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column(

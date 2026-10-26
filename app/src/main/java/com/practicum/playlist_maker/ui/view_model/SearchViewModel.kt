@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 
 class SearchViewModel(
@@ -33,7 +34,7 @@ class SearchViewModel(
     init {
         viewModelScope.launch {
             _searchQuery
-                .debounce(1000L)
+                .debounce(1000L.milliseconds)
                 .distinctUntilChanged()
                 .collect { query ->
                     if (query.isNotBlank()) {
