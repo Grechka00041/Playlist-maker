@@ -1,6 +1,7 @@
 package com.practicum.playlist_maker.ui.theme
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
@@ -13,12 +14,21 @@ private val LightColorScheme = lightColorScheme(
     onSurface = BlackPrimary
 )
 
+private val DarkColorScheme = darkColorScheme(
+    primary = BluePrimary,
+    background = BlackPrimary,
+    surface = BlackPrimary,
+    onPrimary = WhitePrimary,
+    onBackground = WhitePrimary,
+    onSurface = WhitePrimary
+)
 @Composable
 fun PlaylistmakerTheme(
+    isDarkTheme: Boolean,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = LightColorScheme,
+        colorScheme = if (isDarkTheme) DarkColorScheme else LightColorScheme,
         typography = Typography,
         content = content
     )

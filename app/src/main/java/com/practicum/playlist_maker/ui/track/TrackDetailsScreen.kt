@@ -34,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,9 +48,7 @@ import com.practicum.playlist_maker.R
 import com.practicum.playlist_maker.domain.model.Playlist
 import com.practicum.playlist_maker.domain.model.Track
 import com.practicum.playlist_maker.ui.playlist.PlaylistListItem
-import com.practicum.playlist_maker.ui.theme.BlackPrimary
 import com.practicum.playlist_maker.ui.theme.GreyLight
-import com.practicum.playlist_maker.ui.theme.GreyPrimary
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 import com.practicum.playlist_maker.ui.theme.YsTextRegular
 import com.practicum.playlist_maker.ui.view_model.TrackDetailsViewModel
@@ -116,7 +113,7 @@ fun TrackDetailsContent(
             Icon(
                 painter = painterResource(R.drawable.arrow_back),
                 contentDescription = stringResource(R.string.back_button),
-                tint = BlackPrimary,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable { onNavigateBack() }
@@ -176,7 +173,7 @@ fun TrackDetailsContent(
                 Icon(
                     imageVector = Icons.Outlined.AddBox,
                     contentDescription = stringResource(R.string.add_playlist),
-                    tint = BlackPrimary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -192,7 +189,7 @@ fun TrackDetailsContent(
                 Icon(
                     painter = painterResource(R.drawable.favourite_icon),
                     contentDescription = stringResource(R.string.favourite),
-                    tint = if (track.favorite) Color.Red else BlackPrimary,
+                    tint = if (track.favorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -210,7 +207,7 @@ fun TrackDetailsContent(
                 style = TextStyle(
                     fontFamily = YsTextRegular,
                     fontSize = 13.sp,
-                    color = GreyPrimary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             )
 
@@ -219,7 +216,7 @@ fun TrackDetailsContent(
                 style = TextStyle(
                     fontFamily = YsTextRegular,
                     fontSize = 13.sp,
-                    color = BlackPrimary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             )
         }
@@ -255,7 +252,7 @@ fun AddToPlaylistModalSheet(
                 .padding(top = 16.dp, bottom = 16.dp)
                 .align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.titleLarge,
-            color = BlackPrimary
+            color = MaterialTheme.colorScheme.surfaceVariant
         )
 
         LazyColumn(
@@ -279,7 +276,7 @@ fun AddToPlaylistModalSheet(
                         text = "У вас пока нет плейлистов",
                         modifier = Modifier.padding(16.dp).fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        color = GreyPrimary
+                        color =  MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

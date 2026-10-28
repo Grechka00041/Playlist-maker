@@ -1,6 +1,5 @@
 package com.practicum.playlist_maker.ui.playlist
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,20 +19,20 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.practicum.playlist_maker.domain.model.Playlist
 import com.practicum.playlist_maker.R
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.stringResource
+import com.practicum.playlist_maker.domain.model.Playlist
 import com.practicum.playlist_maker.ui.view_model.PlaylistsListViewModel
 
 @Composable
@@ -55,7 +54,7 @@ fun PlaylistsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.LightGray.copy(alpha = 0.7f)),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -63,9 +62,14 @@ fun PlaylistsScreen(
                         .size(32.dp)
                         .clickable { navigateBack() },
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back_button)
+                    contentDescription = stringResource(R.string.back_button),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text(stringResource(R.string.playlists), fontSize = 32.sp)
+                Text(
+                    stringResource(R.string.playlists),
+                    fontSize = 32.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
             Column(
@@ -83,13 +87,14 @@ fun PlaylistsScreen(
                 }
             }
         }
+
         FloatingActionButton(
             modifier = Modifier
                 .padding(32.dp)
                 .align(Alignment.BottomEnd),
             onClick = { addNewPlaylist() },
-            containerColor = Color.Gray,
-            contentColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             shape = CircleShape
         ) {
             Icon(
@@ -105,7 +110,7 @@ fun PlaylistListItem(playlist: Playlist, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick) ,
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -113,15 +118,23 @@ fun PlaylistListItem(playlist: Playlist, onClick: () -> Unit) {
             modifier = Modifier.size(48.dp),
             painter = painterResource(id = R.drawable.ic_music),
             contentDescription = playlist.name,
-            colorFilter = ColorFilter.tint(Color.Gray)
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
         )
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.Start
         ) {
-            Text(playlist.name, fontSize = 16.sp)
-            val text = "${playlist.tracks.size} tracks"
-            Text(text, fontSize = 11.sp, color = Color.Gray)
+            Text(
+                playlist.name,
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            val text = "${playlist.tracks.size} треков"
+            Text(
+                text,
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

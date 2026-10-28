@@ -26,10 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.practicum.playlist_maker.R
-import com.practicum.playlist_maker.ui.theme.BlackPrimary
-import com.practicum.playlist_maker.ui.theme.BluePrimary
-import com.practicum.playlist_maker.ui.theme.GreyPrimary
-import com.practicum.playlist_maker.ui.theme.WhitePrimary
 
 
 private data class MenuItemData(
@@ -49,7 +45,7 @@ fun MainScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BluePrimary)
+            .background(MaterialTheme.colorScheme.primary)
     ) {
         Header()
         Menu(
@@ -67,7 +63,7 @@ private fun Header(){
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = BluePrimary,
+                color = MaterialTheme.colorScheme.primary,
             ),
         contentAlignment = Alignment.CenterStart
 
@@ -75,7 +71,7 @@ private fun Header(){
         Text(
             stringResource(R.string.main_header),
             style = MaterialTheme.typography.titleLarge,
-            color = WhitePrimary,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(16.dp)
         )
     }
@@ -94,7 +90,7 @@ private fun Menu(
             .padding(top = 16.dp)
             .shadow(elevation = 4.dp, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .background(
-                color = WhitePrimary
+                color = MaterialTheme.colorScheme.background
             )
             .padding(top = 8.dp, start = 16.dp, end = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -150,13 +146,13 @@ private fun MainMenuItem(icon: Painter, text: String, onClick: () -> Unit){
             Icon(
                 painter = icon,
                 contentDescription = "icon",
-                tint = BlackPrimary,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(24.dp)
             )
             Text(
                 text,
                 style = MaterialTheme.typography.titleLarge,
-                color = BlackPrimary
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -164,7 +160,7 @@ private fun MainMenuItem(icon: Painter, text: String, onClick: () -> Unit){
             Icon(
                 painter = painterResource(R.drawable.arrow_icon),
                 contentDescription = "arrow_icon",
-                tint = GreyPrimary,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
         }

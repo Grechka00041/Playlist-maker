@@ -2,12 +2,15 @@ package com.practicum.playlist_maker.ui.navigation
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.gson.Gson
+import com.practicum.playlist_maker.database.preferences.ThemeManager
 import com.practicum.playlist_maker.domain.model.Track
 import com.practicum.playlist_maker.ui.favorite.FavoriteScreen
 import com.practicum.playlist_maker.ui.main.MainScreen
@@ -20,6 +23,7 @@ import com.practicum.playlist_maker.ui.track.TrackDetailsScreen
 import com.practicum.playlist_maker.ui.view_model.PlaylistDetailsViewModel
 import com.practicum.playlist_maker.ui.view_model.PlaylistsListViewModel
 import com.practicum.playlist_maker.ui.view_model.SearchViewModel
+import com.practicum.playlist_maker.ui.view_model.SettingsViewModel
 import com.practicum.playlist_maker.ui.view_model.TrackDetailsViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -61,8 +65,13 @@ fun PlaylistHost(
         }
 
         composable(Screen.SETTINGS.name) {
+            val viewModel: SettingsViewModel = koinViewModel()
+            val isDark by viewModel.isDarkTheme.collectAsStateWithLifecycle()
+
             SettingsScreen(
-                onNavigateBack = { navController.navigateBack() }
+                onNavigateBack = { navController.navigateBack() },
+                isDarkTheme = isDark,
+                onToggleTheme = { viewModel.toggleTheme(it) }
             )
         }
 
