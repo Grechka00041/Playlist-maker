@@ -1,6 +1,7 @@
 package com.practicum.playlist_maker.ui.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,7 +20,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +30,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,13 +38,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.practicum.playlist_maker.R
 import com.practicum.playlist_maker.domain.model.Track
 import com.practicum.playlist_maker.ui.theme.BlackPrimary
@@ -47,33 +60,65 @@ import com.practicum.playlist_maker.ui.theme.GreyLight
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
 import com.practicum.playlist_maker.ui.theme.WhitePrimary
 import com.practicum.playlist_maker.ui.view_model.SearchViewModel
+import androidx.lifecycle.compose.currentStateAsState
+import coil.compose.AsyncImage
 
 
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel,
     onNavigateToDetailScreen: (Track) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    modifier: Modifier,
 ){
     val screenState by searchViewModel.searchScreenState.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
+    val searchQuery by searchViewModel.searchQuery.collectAsState()
+
+    var historyList by remember { mutableStateOf<List<String>>(emptyList()) }
+    var isFocused by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner.lifecycle.currentStateAsState().value) {
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            historyList = searchViewModel.getHistoryList()
+        }
+    }
+    LaunchedEffect(screenState) {
+        if (screenState is SearchViewModel.SearchState.Success) {
+            focusManager.clearFocus()
+        }
+    }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(color = WhitePrimary)
     ){
         PanelHeader(onNavigateBack)
         SearchBar(
             query = searchQuery,
-            onQueryChange = { searchQuery = it },
+            onQueryChange = { searchViewModel.updateQuery(it) },
             onClearClick = { searchViewModel.clearSearch() },
             onSearchClick = {
-                if (searchQuery.isNotBlank()) {
-                    searchViewModel.search(searchQuery)
-                }
-            }
+                searchViewModel.updateQuery("")
+                searchViewModel.clearSearch()
+            },
+            onFocusChanged = { isFocused = it },
+            focusRequester = focusRequester
         )
+
+        if (isFocused && searchQuery.isEmpty() && historyList.isNotEmpty()) {
+            HistoryRequests(
+                historyList = historyList,
+                onClick = { word ->
+                    searchViewModel.updateQuery(word)
+                    focusRequester.requestFocus()
+                }
+            )
+        }
+
         SearchResults(
             screenState = screenState,
             modifier = Modifier.padding(top = 16.dp),
@@ -118,7 +163,9 @@ private fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     onClearClick: () -> Unit,
-    onSearchClick: () -> Unit
+    onSearchClick: () -> Unit,
+    onFocusChanged: (Boolean) -> Unit,
+    focusRequester: FocusRequester
 ){
     OutlinedTextField(
         value = query,
@@ -127,7 +174,8 @@ private fun SearchBar(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .height(56.dp)
-        ,
+            .focusRequester(focusRequester)
+            .onFocusChanged { onFocusChanged(it.isFocused)},
         placeholder = {
             Text(
                 text = stringResource(R.string.search),
@@ -266,21 +314,26 @@ private fun TrackListItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = Color.Gray,
+                shape = RoundedCornerShape(8.dp)
+            )
             .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        // Иконка трека (заглушка)
-        Icon(
-            painter = painterResource(id = android.R.drawable.ic_menu_gallery),
-            contentDescription = "Track icon",
-            modifier = Modifier.size(100.dp),
-            tint = Color.LightGray
+        AsyncImage(
+            model = track.image,
+            contentDescription = "Track ${track.trackName}",
+            modifier = Modifier.size(100.dp).clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
+            error = painterResource(id = android.R.drawable.ic_menu_gallery)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column(
-            modifier = Modifier
-                .weight(1f),
+            modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.Start
         ) {
             Text(
@@ -321,5 +374,43 @@ private fun TrackListItem(
             contentDescription = "arrow",
             tint = Color.Gray,
         )
+    }
+}
+
+@Composable
+fun HistoryRequests(
+    historyList: List<String>,
+    onClick: (String) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(max = 200.dp)
+            .border(
+                width = 1.dp,
+                color = Color.Gray,
+                shape = RoundedCornerShape(4.dp)
+            )
+    ) {
+        items(historyList.size) { index ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onClick(historyList[index]) }
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.History,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = historyList[index])
+            }
+            if (historyList[index] != historyList.last()) {
+                HorizontalDivider(thickness = 0.5.dp)
+            }
+        }
     }
 }

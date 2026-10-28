@@ -2,17 +2,22 @@ package com.practicum.playlist_maker.ui.view_model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlist_maker.domain.api.SearchHistoryRepository
 import com.practicum.playlist_maker.domain.api.TracksRepository
 import com.practicum.playlist_maker.domain.model.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 
 class SearchViewModel(
-    private val tracksRepository: TracksRepository
+    private val tracksRepository: TracksRepository,
+    private val searchHistoryRepository: SearchHistoryRepository
 ) : ViewModel() {
     sealed class SearchState {
         object Initial: SearchState()
@@ -23,11 +28,34 @@ class SearchViewModel(
     private val _searchScreenState = MutableStateFlow<SearchState>(SearchState.Initial)
     val searchScreenState = _searchScreenState.asStateFlow()
 
-    fun search(whatSearch: String){
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _searchQuery
+                .debounce(1000L.milliseconds)
+                .distinctUntilChanged()
+                .collect { query ->
+                    if (query.isNotBlank()) {
+                        search(query)
+                    } else {
+                        clearSearch()
+                    }
+                }
+        }
+    }
+
+    fun updateQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    fun search(request: String){
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _searchScreenState.update { SearchState.Searching }
-                val list = tracksRepository.searchTracks(expression = whatSearch)
+                searchHistoryRepository.addToHistory(request)
+                val list = tracksRepository.searchTracks(expression = request)
                 _searchScreenState.update { SearchState.Success(foundList = list) }
             } catch (e: Exception) {
                 val errorMsg = e.localizedMessage ?: "Неизвестная ошибка"
@@ -37,7 +65,10 @@ class SearchViewModel(
     }
 
     fun clearSearch() {
-        _searchScreenState.value = SearchState.Initial
+        _searchScreenState.update { SearchState.Initial }
+        _searchQuery.value = ""
     }
+
+    suspend fun getHistoryList() = searchHistoryRepository.getHistory()
 
 }
