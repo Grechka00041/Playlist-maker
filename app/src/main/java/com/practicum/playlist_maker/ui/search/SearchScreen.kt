@@ -67,6 +67,7 @@ fun SearchScreen(
     onNavigateToDetailScreen: (Track) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier,
+    isDarkTheme: Boolean
 ){
     val screenState by searchViewModel.searchScreenState.collectAsState()
     val searchQuery by searchViewModel.searchQuery.collectAsState()
@@ -119,7 +120,8 @@ fun SearchScreen(
         SearchResults(
             screenState = screenState,
             modifier = Modifier.padding(top = 16.dp),
-            onTrackClick = onNavigateToDetailScreen
+            onTrackClick = onNavigateToDetailScreen,
+            isDarkTheme
         )
     }
 
@@ -229,7 +231,8 @@ private fun SearchBar(
 private fun SearchResults(
     screenState: SearchViewModel.SearchState,
     modifier: Modifier,
-    onTrackClick: (Track) -> Unit
+    onTrackClick: (Track) -> Unit,
+    isDarkTheme: Boolean
 ) {
     when (screenState) {
         is SearchViewModel.SearchState.Initial -> {
@@ -248,7 +251,22 @@ private fun SearchResults(
         is SearchViewModel.SearchState.Success -> {
             val tracks = screenState.foundList
             if (tracks.isEmpty()) {
-                InformerState(titleText = stringResource(R.string.no_tracks_found))
+                Column {
+                    Icon(
+                        painter = painterResource(
+                            if (isDarkTheme) R.drawable.no_files_dark
+                            else R.drawable.no_files
+                        ),
+                        contentDescription = stringResource(R.string.no_tracks_found),
+                        modifier = Modifier.size(120.dp).align(Alignment.CenterHorizontally),
+                        tint = Color.Unspecified
+                    )
+                    InformerState(
+                        titleText = stringResource(R.string.no_tracks_found),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+
             } else {
                 LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(tracks.size) { index ->
@@ -262,10 +280,22 @@ private fun SearchResults(
         }
 
         is SearchViewModel.SearchState.Fail -> {
-            InformerState(
-                titleText = screenState.error,
-                subtitleText = stringResource(R.string.check_connection)
-            )
+            Column {
+                Icon(
+                    painter = painterResource(
+                        if (isDarkTheme) R.drawable.no_internet_dark
+                        else R.drawable.no_internet
+                    ),
+                    contentDescription = stringResource(R.string.check_connection),
+                    modifier = Modifier.size(120.dp).align(Alignment.CenterHorizontally),
+                    tint = Color.Unspecified
+                )
+                InformerState(
+                    titleText = screenState.error,
+                    subtitleText = stringResource(R.string.check_connection),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
         }
     }
 }

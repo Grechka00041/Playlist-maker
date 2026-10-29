@@ -48,8 +48,6 @@ import com.practicum.playlist_maker.R
 import com.practicum.playlist_maker.domain.model.Playlist
 import com.practicum.playlist_maker.domain.model.Track
 import com.practicum.playlist_maker.ui.playlist.PlaylistListItem
-import com.practicum.playlist_maker.ui.theme.GreyLight
-import com.practicum.playlist_maker.ui.theme.WhitePrimary
 import com.practicum.playlist_maker.ui.theme.YsTextRegular
 import com.practicum.playlist_maker.ui.view_model.TrackDetailsViewModel
 
@@ -64,13 +62,17 @@ fun TrackDetailsScreen(
 
     var isSheetVisible by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier.fillMaxSize().background(WhitePrimary)) {
+    Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         when (val state = uiState) {
             is TrackDetailsViewModel.UiState.Loading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
             is TrackDetailsViewModel.UiState.Error -> {
-                Text(state.message, modifier = Modifier.align(Alignment.Center))
+                Text(
+                    text = state.message,
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.error
+                )
             }
             is TrackDetailsViewModel.UiState.Success -> {
                 TrackDetailsContent(
@@ -101,10 +103,8 @@ fun TrackDetailsContent(
     onNavigateBack: () -> Unit,
     onToggleFavorite: () -> Unit,
     onAddToPlaylist: () -> Unit
-){
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,6 +141,7 @@ fun TrackDetailsContent(
         Text(
             text = track.trackName,
             style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 24.dp, end = 24.dp, top = 16.dp)
@@ -149,6 +150,7 @@ fun TrackDetailsContent(
         Text(
             text = track.artistName,
             style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 24.dp, end = 24.dp, top = 8.dp)
@@ -166,7 +168,7 @@ fun TrackDetailsContent(
                 modifier = Modifier
                     .size(51.dp)
                     .clip(CircleShape)
-                    .background(GreyLight)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .clickable { onAddToPlaylist() },
                 contentAlignment = Alignment.Center
             ) {
@@ -182,14 +184,15 @@ fun TrackDetailsContent(
                 modifier = Modifier
                     .size(51.dp)
                     .clip(CircleShape)
-                    .background(GreyLight)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .clickable { onToggleFavorite() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(R.drawable.favourite_icon),
                     contentDescription = stringResource(R.string.favourite),
-                    tint = if (track.favorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = if (track.favorite) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -229,7 +232,7 @@ fun AddToPlaylistModalSheet(
     playlists: List<Playlist>,
     onDismiss: () -> Unit,
     onPlaylistSelected: (Playlist) -> Unit
-){
+) {
     val sheetState = rememberModalBottomSheetState()
 
     ModalBottomSheet(
@@ -242,7 +245,7 @@ fun AddToPlaylistModalSheet(
                     .height(4.dp)
                     .padding(vertical = 8.dp)
                     .clip(RoundedCornerShape(2.dp))
-                    .background(WhitePrimary)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             )
         }
     ) {
@@ -252,7 +255,7 @@ fun AddToPlaylistModalSheet(
                 .padding(top = 16.dp, bottom = 16.dp)
                 .align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.surfaceVariant
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         LazyColumn(
@@ -276,7 +279,7 @@ fun AddToPlaylistModalSheet(
                         text = "У вас пока нет плейлистов",
                         modifier = Modifier.padding(16.dp).fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        color =  MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -284,20 +287,22 @@ fun AddToPlaylistModalSheet(
     }
 }
 
-@Preview
+@Preview(showSystemUi = true)
 @Composable
 fun TrackDetailsContentPreview() {
-    TrackDetailsContent(
-        track = Track(
-            id = 1,
-            trackName = "Yesterday (Remastered 2009)",
-            artistName = "The Beatles",
-            trackTime = "2:55",
-            image = "",
-            favorite = false
-        ),
-        onNavigateBack = {},
-        onToggleFavorite = {},
-        onAddToPlaylist = {}
-    )
+    MaterialTheme {
+        TrackDetailsContent(
+            track = Track(
+                id = 1,
+                trackName = "Yesterday (Remastered 2009)",
+                artistName = "The Beatles",
+                trackTime = "2:55",
+                image = "",
+                favorite = false
+            ),
+            onNavigateBack = {},
+            onToggleFavorite = {},
+            onAddToPlaylist = {}
+        )
+    }
 }

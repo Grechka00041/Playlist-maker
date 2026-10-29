@@ -38,7 +38,7 @@ private data class MenuItemData(
 fun MainScreen(
     onNavigateToSearch: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToPlaylsists: () -> Unit,
+    onNavigateToPlaylists: () -> Unit,
     onNavigateToFavorite: () -> Unit
 
 ){
@@ -51,7 +51,7 @@ fun MainScreen(
         Menu(
             onNavigateToSearch = onNavigateToSearch,
             onNavigateToSettings = onNavigateToSettings,
-            onNavigateToPlaylsists = onNavigateToPlaylsists,
+            onNavigateToPlaylsists = onNavigateToPlaylists,
             onNavigateToFavorite = onNavigateToFavorite
         )
     }

@@ -14,7 +14,7 @@ import com.practicum.playlist_maker.database.entity.TrackEntity
         TrackEntity::class,
         PlaylistEntity::class,
         PlaylistTrackCrossRef::class
-    ], version = 1, exportSchema = false
+    ], version = 2, exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun tracksDao(): TracksDao

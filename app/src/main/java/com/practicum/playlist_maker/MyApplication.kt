@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import com.practicum.playlist_maker.data.di.repositoryModule
 import com.practicum.playlist_maker.database.di.databaseModule
 import com.practicum.playlist_maker.domain.model.Track
+import com.practicum.playlist_maker.ui.view_model.FavoritesViewModel
 import com.practicum.playlist_maker.ui.view_model.PlaylistDetailsViewModel
 import com.practicum.playlist_maker.ui.view_model.PlaylistsListViewModel
 import com.practicum.playlist_maker.ui.view_model.SearchViewModel
@@ -71,7 +72,17 @@ class MyApplication : Application() {
                 }
             }
 
-            modules(getDataStoreModule(), settingsViewModelModule, repositoryModule, databaseModule, viewModelModule, playlistsViewModule, trackDetailsViewModel, playlistDetailsViewModel)
+            val favoritesViewModelModule = module {
+                viewModel { FavoritesViewModel(get()) }
+            }
+
+            modules(
+                getDataStoreModule(), favoritesViewModelModule,
+                settingsViewModelModule, repositoryModule,
+                databaseModule, viewModelModule,
+                playlistsViewModule, trackDetailsViewModel,
+                playlistDetailsViewModel
+            )
         }
 
     }

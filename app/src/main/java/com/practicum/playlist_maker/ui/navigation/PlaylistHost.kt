@@ -20,12 +20,14 @@ import com.practicum.playlist_maker.ui.playlist.PlaylistsScreen
 import com.practicum.playlist_maker.ui.search.SearchScreen
 import com.practicum.playlist_maker.ui.settings.SettingsScreen
 import com.practicum.playlist_maker.ui.track.TrackDetailsScreen
+import com.practicum.playlist_maker.ui.view_model.FavoritesViewModel
 import com.practicum.playlist_maker.ui.view_model.PlaylistDetailsViewModel
 import com.practicum.playlist_maker.ui.view_model.PlaylistsListViewModel
 import com.practicum.playlist_maker.ui.view_model.SearchViewModel
 import com.practicum.playlist_maker.ui.view_model.SettingsViewModel
 import com.practicum.playlist_maker.ui.view_model.TrackDetailsViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.getKoin
 import org.koin.core.parameter.parametersOf
 
 @Composable
@@ -47,12 +49,15 @@ fun PlaylistHost(
             MainScreen(
                 onNavigateToSearch = { navController.navigateToSearch() },
                 onNavigateToSettings = { navController.navigateToSettings() },
-                onNavigateToPlaylsists = { navController.navigate(Screen.PLAYLISTS.name) },
+                onNavigateToPlaylists = { navController.navigate(Screen.PLAYLISTS.name) },
                 onNavigateToFavorite = { navController.navigate(Screen.FAVORITE.name) }
             )
         }
 
         composable(Screen.SEARCH.name) {
+            val themeManager: ThemeManager = getKoin().get()
+            val isDark by themeManager.getThemeFlow()
+                .collectAsStateWithLifecycle(initialValue = false)
             SearchScreen(
                 searchViewModel = searchViewModel,
                 onNavigateToDetailScreen = { track ->
@@ -60,7 +65,8 @@ fun PlaylistHost(
                     navController.navigate("${Screen.TRACK_DETAILS.name}/$json")
                 },
                 onNavigateBack = { navController.navigateBack() },
-                modifier = Modifier
+                modifier = Modifier,
+                isDarkTheme = isDark
             )
         }
 
@@ -77,8 +83,18 @@ fun PlaylistHost(
 
 
         composable(Screen.FAVORITE.name) {
+            val viewModel: FavoritesViewModel = koinViewModel()
+            val themeManager: ThemeManager = getKoin().get()
+            val isDark by themeManager.getThemeFlow()
+                .collectAsStateWithLifecycle(initialValue = false)
             FavoriteScreen(
-                onNavigateBack = { navController.navigateBack() }
+                viewModel = viewModel,
+                onNavigateBack = { navController.navigateBack() },
+                onTrackClick = { track ->
+                    val json = Uri.encode(gson.toJson(track))
+                    navController.navigate("${Screen.TRACK_DETAILS.name}/$json")
+                },
+                isDark = isDark
             )
         }
 

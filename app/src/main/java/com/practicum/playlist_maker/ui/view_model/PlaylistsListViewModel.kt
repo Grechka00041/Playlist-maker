@@ -8,6 +8,9 @@ import com.practicum.playlist_maker.domain.model.Playlist
 import com.practicum.playlist_maker.domain.model.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -16,6 +19,13 @@ class PlaylistsListViewModel(
     private val playlistsRepository: PlaylistsRepository,
     private val tracksRepository: TracksRepository
 ) : ViewModel() {
+
+    private var _coverImageUri = MutableStateFlow<String?>(null)
+    val coverImageUri: StateFlow<String?> = _coverImageUri.asStateFlow()
+
+    fun setCoverImageUri(uri: String?) {
+        _coverImageUri.value = uri
+    }
 
     val playlists: Flow<List<Playlist>> = flow {
         val collectedPlaylists = mutableListOf<Playlist>()
@@ -28,7 +38,7 @@ class PlaylistsListViewModel(
 
     fun createNewPlayList(namePlaylist: String, description: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            playlistsRepository.addNewPlaylist(namePlaylist, description, "uri")
+            playlistsRepository.addNewPlaylist(namePlaylist, description, _coverImageUri.value)
         }
     }
 

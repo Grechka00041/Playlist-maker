@@ -31,8 +31,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val isDark by themeManager.getThemeFlow()
-                .collectAsStateWithLifecycle(initialValue = false)
+            val isDark by themeManager.getThemeFlow().collectAsStateWithLifecycle(initialValue = false)
+
             PlaylistmakerTheme(isDark) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     PlaylistHost(

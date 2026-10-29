@@ -14,7 +14,7 @@ import org.koin.dsl.module
 
 val databaseModule = module {
     single<AppDatabase> {
-        Room.databaseBuilder(get(), AppDatabase::class.java, "playlist_db").build()
+        Room.databaseBuilder(get(), AppDatabase::class.java, "playlist_db").fallbackToDestructiveMigration(true).build()
     }
     single<ThemeManager> { ThemeManager(get()) }
 
