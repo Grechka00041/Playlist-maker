@@ -1,17 +1,17 @@
 package com.practicum.playlist_maker.domain.impl
 
-import com.practicum.playlist_maker.data.storage.DatabaseMock
+import com.practicum.playlist_maker.database.preferences.SearchHistoryPreferences
 import com.practicum.playlist_maker.domain.api.SearchHistoryRepository
 
 class SearchHistoryRepositoryImpl(
-    private val database: DatabaseMock
+    private val preferences: SearchHistoryPreferences
 ) : SearchHistoryRepository {
 
     override suspend fun getHistory(): List<String> {
-        return database.getHistory()
+        return preferences.getEntries()
     }
 
     override fun addToHistory(word: String) {
-        database.addToHistory(word= word)
+        preferences.addEntry(word)
     }
 }

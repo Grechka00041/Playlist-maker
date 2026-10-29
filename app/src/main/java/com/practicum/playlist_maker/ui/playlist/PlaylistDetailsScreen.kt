@@ -38,9 +38,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.practicum.playlist_maker.R
 import com.practicum.playlist_maker.domain.model.Track
-import com.practicum.playlist_maker.ui.theme.BlackPrimary
-import com.practicum.playlist_maker.ui.theme.GreyPrimary
-import com.practicum.playlist_maker.ui.theme.WhitePrimary
 import com.practicum.playlist_maker.ui.view_model.PlaylistDetailsViewModel
 
 @Composable
@@ -54,7 +51,7 @@ fun PlaylistDetailsScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(WhitePrimary)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         if (playlist == null) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -65,11 +62,10 @@ fun PlaylistDetailsScreen(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                // Back button
                 Icon(
                     painter = painterResource(R.drawable.arrow_back),
                     contentDescription = stringResource(R.string.back_button),
-                    tint = BlackPrimary,
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .size(24.dp)
                         .clickable { onNavigateBack() }
@@ -77,13 +73,12 @@ fun PlaylistDetailsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Cover Image
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(GreyPrimary.copy(alpha = 0.2f)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     if (!currentPlaylist.coverImageUri.isNullOrEmpty() && currentPlaylist.coverImageUri != "uri") {
@@ -98,18 +93,17 @@ fun PlaylistDetailsScreen(
                             painter = painterResource(R.drawable.ic_music),
                             contentDescription = currentPlaylist.name,
                             modifier = Modifier.size(96.dp),
-                            colorFilter = ColorFilter.tint(GreyPrimary)
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Playlist Name
                 Text(
                     text = currentPlaylist.name,
                     style = MaterialTheme.typography.titleLarge,
-                    color = BlackPrimary,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 24.sp
                 )
 
@@ -118,36 +112,33 @@ fun PlaylistDetailsScreen(
                     Text(
                         text = currentPlaylist.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = GreyPrimary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 16.sp
                     )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Metadata: Minutes & Tracks count
                 val totalMinutes = calculateTotalDurationMinutes(currentPlaylist.tracks)
                 val tracksCountText = formatTracksCount(currentPlaylist.tracks.size)
                 Text(
                     text = "$totalMinutes минут • $tracksCountText",
                     style = MaterialTheme.typography.bodySmall,
-                    color = GreyPrimary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Menu icon
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = "Menu",
-                    tint = BlackPrimary,
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(24.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Tracks List
                 if (currentPlaylist.tracks.isEmpty()) {
                     Box(
                         modifier = Modifier
@@ -157,7 +148,7 @@ fun PlaylistDetailsScreen(
                     ) {
                         Text(
                             text = "В этом плейлисте нет треков",
-                            color = GreyPrimary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -205,11 +196,25 @@ fun PlaylistTrackItem(track: Track, onClick: () -> Unit) {
                 .padding(horizontal = 12.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            Text(text = track.trackName, fontSize = 16.sp, color = BlackPrimary, maxLines = 1)
+            Text(
+                text = track.trackName,
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 1
+            )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = track.artistName, fontSize = 13.sp, color = GreyPrimary, maxLines = 1)
+            Text(
+                text = track.artistName,
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
+            )
         }
-        Text(text = track.trackTime, fontSize = 13.sp, color = GreyPrimary)
+        Text(
+            text = track.trackTime,
+            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

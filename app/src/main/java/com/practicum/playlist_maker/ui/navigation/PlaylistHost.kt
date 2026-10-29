@@ -2,12 +2,15 @@ package com.practicum.playlist_maker.ui.navigation
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.gson.Gson
+import com.practicum.playlist_maker.database.preferences.ThemeManager
 import com.practicum.playlist_maker.domain.model.Track
 import com.practicum.playlist_maker.ui.favorite.FavoriteScreen
 import com.practicum.playlist_maker.ui.main.MainScreen
@@ -17,11 +20,14 @@ import com.practicum.playlist_maker.ui.playlist.PlaylistsScreen
 import com.practicum.playlist_maker.ui.search.SearchScreen
 import com.practicum.playlist_maker.ui.settings.SettingsScreen
 import com.practicum.playlist_maker.ui.track.TrackDetailsScreen
+import com.practicum.playlist_maker.ui.view_model.FavoritesViewModel
 import com.practicum.playlist_maker.ui.view_model.PlaylistDetailsViewModel
 import com.practicum.playlist_maker.ui.view_model.PlaylistsListViewModel
 import com.practicum.playlist_maker.ui.view_model.SearchViewModel
+import com.practicum.playlist_maker.ui.view_model.SettingsViewModel
 import com.practicum.playlist_maker.ui.view_model.TrackDetailsViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.getKoin
 import org.koin.core.parameter.parametersOf
 
 @Composable
@@ -43,12 +49,15 @@ fun PlaylistHost(
             MainScreen(
                 onNavigateToSearch = { navController.navigateToSearch() },
                 onNavigateToSettings = { navController.navigateToSettings() },
-                onNavigateToPlaylsists = { navController.navigate(Screen.PLAYLISTS.name) },
+                onNavigateToPlaylists = { navController.navigate(Screen.PLAYLISTS.name) },
                 onNavigateToFavorite = { navController.navigate(Screen.FAVORITE.name) }
             )
         }
 
         composable(Screen.SEARCH.name) {
+            val themeManager: ThemeManager = getKoin().get()
+            val isDark by themeManager.getThemeFlow()
+                .collectAsStateWithLifecycle(initialValue = false)
             SearchScreen(
                 searchViewModel = searchViewModel,
                 onNavigateToDetailScreen = { track ->
@@ -56,20 +65,36 @@ fun PlaylistHost(
                     navController.navigate("${Screen.TRACK_DETAILS.name}/$json")
                 },
                 onNavigateBack = { navController.navigateBack() },
-                modifier = Modifier
+                modifier = Modifier,
+                isDarkTheme = isDark
             )
         }
 
         composable(Screen.SETTINGS.name) {
+            val viewModel: SettingsViewModel = koinViewModel()
+            val isDark by viewModel.isDarkTheme.collectAsStateWithLifecycle()
+
             SettingsScreen(
-                onNavigateBack = { navController.navigateBack() }
+                onNavigateBack = { navController.navigateBack() },
+                isDarkTheme = isDark,
+                onToggleTheme = { viewModel.toggleTheme(it) }
             )
         }
 
 
         composable(Screen.FAVORITE.name) {
+            val viewModel: FavoritesViewModel = koinViewModel()
+            val themeManager: ThemeManager = getKoin().get()
+            val isDark by themeManager.getThemeFlow()
+                .collectAsStateWithLifecycle(initialValue = false)
             FavoriteScreen(
-                onNavigateBack = { navController.navigateBack() }
+                viewModel = viewModel,
+                onNavigateBack = { navController.navigateBack() },
+                onTrackClick = { track ->
+                    val json = Uri.encode(gson.toJson(track))
+                    navController.navigate("${Screen.TRACK_DETAILS.name}/$json")
+                },
+                isDark = isDark
             )
         }
 
