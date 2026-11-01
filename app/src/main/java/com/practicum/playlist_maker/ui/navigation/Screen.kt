@@ -5,7 +5,6 @@ enum class Screen {
     SEARCH,
     SETTINGS,
     PLAYLISTS,
-
     PLAYLIST_DETAILS,
     FAVORITE,
     ADD_PLAYLIST,

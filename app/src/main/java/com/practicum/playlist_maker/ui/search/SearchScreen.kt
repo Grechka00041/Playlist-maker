@@ -55,10 +55,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.practicum.playlist_maker.R
 import com.practicum.playlist_maker.domain.model.Track
-import com.practicum.playlist_maker.ui.theme.BlackPrimary
-import com.practicum.playlist_maker.ui.theme.GreyLight
 import com.practicum.playlist_maker.ui.theme.GreyPrimary
-import com.practicum.playlist_maker.ui.theme.WhitePrimary
 import com.practicum.playlist_maker.ui.view_model.SearchViewModel
 import androidx.lifecycle.compose.currentStateAsState
 import coil.compose.AsyncImage
@@ -70,6 +67,7 @@ fun SearchScreen(
     onNavigateToDetailScreen: (Track) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier,
+    isDarkTheme: Boolean
 ){
     val screenState by searchViewModel.searchScreenState.collectAsState()
     val searchQuery by searchViewModel.searchQuery.collectAsState()
@@ -94,7 +92,7 @@ fun SearchScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = WhitePrimary)
+            .background(color = MaterialTheme.colorScheme.background)
     ){
         PanelHeader(onNavigateBack)
         SearchBar(
@@ -122,7 +120,8 @@ fun SearchScreen(
         SearchResults(
             screenState = screenState,
             modifier = Modifier.padding(top = 16.dp),
-            onTrackClick = onNavigateToDetailScreen
+            onTrackClick = onNavigateToDetailScreen,
+            isDarkTheme
         )
     }
 
@@ -144,7 +143,7 @@ private fun PanelHeader(
             Icon(
                 painter = painterResource(R.drawable.arrow_back),
                 contentDescription = stringResource(R.string.arrow_back),
-                tint = BlackPrimary,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(16.dp)
             )
         }
@@ -152,7 +151,7 @@ private fun PanelHeader(
             stringResource(R.string.search),
             modifier = Modifier.padding(4.dp),
             style = MaterialTheme.typography.titleLarge,
-            color = BlackPrimary
+            color = MaterialTheme.colorScheme.onBackground
         )
 
     }
@@ -184,7 +183,7 @@ private fun SearchBar(
                     fontSize = 14.sp,
                     lineHeight = 16.sp
                 ),
-                color = GreyPrimary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
         leadingIcon = {
@@ -194,7 +193,7 @@ private fun SearchBar(
                 Icon(
                     painterResource(R.drawable.search_icon),
                     contentDescription = stringResource(R.string.search),
-                    tint = GreyPrimary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -208,7 +207,7 @@ private fun SearchBar(
                     Icon(
                         Icons.Default.Clear,
                         contentDescription = stringResource(R.string.clear),
-                        tint = GreyPrimary ,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant ,
                         modifier = Modifier.size(14.dp)
                     )
                 }
@@ -218,12 +217,12 @@ private fun SearchBar(
         singleLine = true,
         shape = RoundedCornerShape(8.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedContainerColor = GreyLight,
-            focusedContainerColor = GreyLight,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
             unfocusedBorderColor = Color.Transparent,
             focusedBorderColor = Color.Transparent,
-            focusedTextColor = GreyPrimary,
-            unfocusedTextColor = GreyPrimary,
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
         )
     )
 }
@@ -232,7 +231,8 @@ private fun SearchBar(
 private fun SearchResults(
     screenState: SearchViewModel.SearchState,
     modifier: Modifier,
-    onTrackClick: (Track) -> Unit
+    onTrackClick: (Track) -> Unit,
+    isDarkTheme: Boolean
 ) {
     when (screenState) {
         is SearchViewModel.SearchState.Initial -> {
@@ -251,7 +251,22 @@ private fun SearchResults(
         is SearchViewModel.SearchState.Success -> {
             val tracks = screenState.foundList
             if (tracks.isEmpty()) {
-                InformerState(titleText = stringResource(R.string.no_tracks_found))
+                Column {
+                    Icon(
+                        painter = painterResource(
+                            if (isDarkTheme) R.drawable.no_files_dark
+                            else R.drawable.no_files
+                        ),
+                        contentDescription = stringResource(R.string.no_tracks_found),
+                        modifier = Modifier.size(120.dp).align(Alignment.CenterHorizontally),
+                        tint = Color.Unspecified
+                    )
+                    InformerState(
+                        titleText = stringResource(R.string.no_tracks_found),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+
             } else {
                 LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(tracks.size) { index ->
@@ -265,10 +280,22 @@ private fun SearchResults(
         }
 
         is SearchViewModel.SearchState.Fail -> {
-            InformerState(
-                titleText = screenState.error,
-                subtitleText = stringResource(R.string.check_connection)
-            )
+            Column {
+                Icon(
+                    painter = painterResource(
+                        if (isDarkTheme) R.drawable.no_internet_dark
+                        else R.drawable.no_internet
+                    ),
+                    contentDescription = stringResource(R.string.check_connection),
+                    modifier = Modifier.size(120.dp).align(Alignment.CenterHorizontally),
+                    tint = Color.Unspecified
+                )
+                InformerState(
+                    titleText = screenState.error,
+                    subtitleText = stringResource(R.string.check_connection),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
         }
     }
 }
@@ -290,7 +317,7 @@ private fun InformerState(
         Text(
             text = titleText,
             fontSize = 18.sp,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
         )
 
@@ -299,7 +326,7 @@ private fun InformerState(
             Text(
                 text = it,
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
         }
@@ -316,7 +343,7 @@ private fun TrackListItem(
             .fillMaxWidth()
             .border(
                 width = 1.dp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 shape = RoundedCornerShape(8.dp)
             )
             .clickable(onClick = onClick),
@@ -346,20 +373,20 @@ private fun TrackListItem(
                 Text(
                     text = track.artistName,
                     fontSize = 11.sp,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = "•",
                     fontSize = 16.sp,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 4.dp)
                 )
                 Text(
                     track.trackTime,
                     fontSize = 11.sp,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                 )
             }
@@ -372,7 +399,7 @@ private fun TrackListItem(
             modifier = Modifier.size(24.dp).padding(4.dp),
             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
             contentDescription = "arrow",
-            tint = Color.Gray,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -388,7 +415,7 @@ fun HistoryRequests(
             .heightIn(max = 200.dp)
             .border(
                 width = 1.dp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 shape = RoundedCornerShape(4.dp)
             )
     ) {

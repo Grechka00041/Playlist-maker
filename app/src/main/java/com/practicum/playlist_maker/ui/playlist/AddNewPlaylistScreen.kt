@@ -1,40 +1,39 @@
 package com.practicum.playlist_maker.ui.playlist
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.practicum.playlist_maker.R
-import com.practicum.playlist_maker.ui.theme.BluePrimary
-import com.practicum.playlist_maker.ui.theme.GreyPrimary
-import com.practicum.playlist_maker.ui.theme.WhitePrimary
 import com.practicum.playlist_maker.ui.view_model.PlaylistsListViewModel
 
 @Composable
@@ -42,105 +41,133 @@ fun AddPlaylistScreen(
     onNavigateBack: () -> Unit,
     playlistsListViewModel: PlaylistsListViewModel
 ) {
-
     var playlistName by remember { mutableStateOf("") }
     var playlistDescription by remember { mutableStateOf("") }
     val isEnabled = playlistName.isNotBlank()
 
-    Box(modifier = Modifier.fillMaxSize().background(WhitePrimary)) {
-        Column(
+    val coverImageUri by playlistsListViewModel.coverImageUri.collectAsState()
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            playlistsListViewModel.setCoverImageUri(it.toString())
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp)
+                .padding(top = 8.dp, bottom = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
+            Icon(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clickable { onNavigateBack() },
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back_button)
-                )
-                Text(stringResource(R.string.add_new_playlist), fontSize = 32.sp)
-            }
+                    .size(32.dp)
+                    .clickable { onNavigateBack() },
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.back_button),
+                tint = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                stringResource(R.string.add_new_playlist),
+                fontSize = 32.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(start = 8.dp)
+            )
         }
 
-        Column{
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 188.dp, bottom = 188.dp),
-                contentAlignment = Alignment.Center
-            ) {
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .padding(vertical = 24.dp)
+                .clickable {
+                    imagePickerLauncher.launch("image/*")
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            if (!coverImageUri.isNullOrEmpty()) {
+                AsyncImage(
+                    model = Uri.parse(coverImageUri),
+                    contentDescription = stringResource(R.string.playlist_cover),
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.ic_music),
+                    error = painterResource(R.drawable.ic_music)
+                )
+            } else {
                 Image(
                     modifier = Modifier.size(100.dp),
                     painter = painterResource(R.drawable.ic_music),
-                    contentDescription = stringResource(R.string.add_new_playlist),
-                    colorFilter = ColorFilter.tint(Color.Gray)
+                    contentDescription = stringResource(R.string.playlist_cover),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
                 )
-            }
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
-                    .align(Alignment.CenterHorizontally),
-                value = playlistName,
-                onValueChange = { playlistName = it},
-                label = { Text("Название*") },
-                singleLine = true,
-                isError = !isEnabled && playlistName.isNotEmpty(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = WhitePrimary,
-                    focusedContainerColor = WhitePrimary,
-                    unfocusedBorderColor = GreyPrimary,
-                    focusedBorderColor = BluePrimary,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = GreyPrimary,
-                    errorBorderColor = Color.Red
-                )
-            )
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.CenterHorizontally),
-                value = "",
-                onValueChange = {
-                    playlistDescription = it
-                },
-                label = { Text("Описание") },
-                maxLines = 5,
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = WhitePrimary,
-                    focusedContainerColor = WhitePrimary,
-                    unfocusedBorderColor = GreyPrimary,
-                    focusedBorderColor = BluePrimary,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = GreyPrimary,
-                )
-            )
-
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 17.dp, end = 17.dp, top = 100.dp)
-                    .align(Alignment.CenterHorizontally ),
-                enabled = isEnabled,
-                onClick = {
-                    if (isEnabled) playlistsListViewModel.createNewPlayList(playlistName, playlistDescription)
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = BluePrimary,
-                    contentColor = WhitePrimary,
-                    disabledContainerColor = GreyPrimary
-                )
-            ) {
-                Text("Создать")
             }
         }
+
+        OutlinedTextField(
+            value = playlistName,
+            onValueChange = { playlistName = it },
+            label = { Text("Название*") },
+            singleLine = true,
+            isError = !isEnabled && playlistName.isNotEmpty(),
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                errorBorderColor = MaterialTheme.colorScheme.error
+            )
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = playlistDescription,
+            onValueChange = { playlistDescription = it },
+            label = { Text("Описание") },
+            maxLines = 5,
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = {
+                if (isEnabled) playlistsListViewModel.createNewPlayList(playlistName, playlistDescription)
+            },
+            enabled = isEnabled,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+            )
+        ) {
+            Text(stringResource(R.string.create))
+        }
+
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }

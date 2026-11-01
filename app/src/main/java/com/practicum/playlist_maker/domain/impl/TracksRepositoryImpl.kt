@@ -4,16 +4,22 @@ import com.practicum.playlist_maker.data.NetworkClient
 import com.practicum.playlist_maker.data.dto.TrackDto
 import com.practicum.playlist_maker.data.dto.TracksSearchRequest
 import com.practicum.playlist_maker.data.dto.TracksSearchResponse
-import com.practicum.playlist_maker.data.storage.DatabaseMock
+import com.practicum.playlist_maker.database.AppDatabase
+import com.practicum.playlist_maker.database.dao.toEntity
+import com.practicum.playlist_maker.database.dao.toTrack
+import com.practicum.playlist_maker.database.entity.PlaylistTrackCrossRef
 import com.practicum.playlist_maker.domain.api.TracksRepository
 import com.practicum.playlist_maker.domain.model.Track
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 class TracksRepositoryImpl(
-    private val database: DatabaseMock,
+    private val database: AppDatabase,
     private val networkClient: NetworkClient
 ) : TracksRepository {
+
+    private val dao = database.tracksDao()
+    private val playlistTrackDao = database.playlistTrackDao()
 
     override suspend fun searchTracks(expression: String): List<Track> {
         val response = networkClient.doRequest(TracksSearchRequest(expression))
@@ -29,47 +35,36 @@ class TracksRepositoryImpl(
     }
 
     override suspend fun getTrackByNameAndArtist(track: Track): Flow<Track?> {
-
-        val query = "${track.trackName} ${track.artistName}"
-
-        return flow {
-            try {
-                val response = networkClient.doRequest(TracksSearchRequest(query))
-
-                if (response.resultCode == 200 && response is TracksSearchResponse) {
-                    val foundDto = response.results.firstOrNull { dto ->
-                        dto.trackName.equals(track.trackName, ignoreCase = true) &&
-                                dto.artistName.equals(track.artistName, ignoreCase = true)
-                    }
-                    emit(foundDto?.let { mapToDomain(it) })
-                } else {
-                    emit(null)
-                }
-            } catch (e: Exception) {
-                emit(null)
-            }
-        }
+        return dao.getTrackByNameAndArtist(track.trackName, track.artistName).map { it?.toTrack() }
     }
 
     override suspend fun addTrackToPlaylist(trackId: Long, playlistId: Long) {
-        database.addTrackToPlaylist(trackId, playlistId)
+        playlistTrackDao.addTrackToPlaylist(
+            PlaylistTrackCrossRef(
+                playlistId = playlistId,
+                trackId = trackId
+            )
+        )
     }
 
     override suspend fun deleteTrackFromPlaylist(trackId: Long, playlistId: Long) {
-        database.removeTrackFromPlaylist(trackId, playlistId)
+        playlistTrackDao.removeTrackFromPlaylist(trackId, playlistId)
     }
 
+
     override suspend fun updateTrackFavoriteStatus(track: Track, isFavorite: Boolean) {
-        database.insertTrack(track.copy(favorite = isFavorite))
+        dao.insertTrack(track.copy(favorite = isFavorite).toEntity())
     }
 
     override suspend fun insertTrack(track: Track) {
-        database.insertTrack(track)
+        dao.insertTrack(track.toEntity())
     }
 
 
     override fun getFavoriteTracks(): Flow<List<Track>> {
-        return database.getFavoriteTracks()
+        return dao.getFavoriteTracks().map {
+            entities -> entities.map { it.toTrack()  }
+        }
     }
 
     private fun mapToDomain(dto: TrackDto): Track {
